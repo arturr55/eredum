@@ -1,0 +1,252 @@
+/* Анимированные CSS персонажи */
+
+.hero-avatar {
+  width: 60px;
+  height: 60px;
+  position: relative;
+  display: inline-block;
+}
+
+/* ПАЛАДИН */
+.avatar-paladin {
+  animation: paladin-idle 2s ease-in-out infinite;
+}
+.avatar-paladin .body {
+  width: 28px; height: 34px;
+  background: linear-gradient(180deg, #c0a060, #8b6914);
+  border-radius: 4px 4px 2px 2px;
+  position: absolute;
+  left: 50%; top: 18px;
+  transform: translateX(-50%);
+  box-shadow: 0 0 8px rgba(255,215,0,0.4);
+}
+.avatar-paladin .head {
+  width: 22px; height: 20px;
+  background: linear-gradient(180deg, #e8c87a, #c0a050);
+  border-radius: 50% 50% 40% 40%;
+  position: absolute;
+  left: 50%; top: 0;
+  transform: translateX(-50%);
+  border: 2px solid #FFD700;
+}
+.avatar-paladin .shield {
+  width: 16px; height: 20px;
+  background: linear-gradient(135deg, #FFD700, #b8860b);
+  border-radius: 4px 4px 6px 6px;
+  position: absolute;
+  left: 2px; top: 22px;
+  border: 1px solid #FFD700;
+  box-shadow: 0 0 6px rgba(255,215,0,0.5);
+}
+.avatar-paladin .glow {
+  position: absolute;
+  width: 60px; height: 60px;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(255,215,0,0.15) 0%, transparent 70%);
+  animation: paladin-glow 2s ease-in-out infinite;
+}
+@keyframes paladin-idle {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-3px); }
+}
+@keyframes paladin-glow {
+  0%, 100% { opacity: 0.5; transform: scale(1); }
+  50% { opacity: 1; transform: scale(1.1); }
+}
+
+/* ВЕДЬМА */
+.avatar-witch {
+  animation: witch-float 3s ease-in-out infinite;
+}
+.avatar-witch .body {
+  width: 22px; height: 30px;
+  background: linear-gradient(180deg, #4a0080, #2d0050);
+  border-radius: 2px 2px 8px 8px;
+  position: absolute;
+  left: 50%; top: 20px;
+  transform: translateX(-50%);
+}
+.avatar-witch .head {
+  width: 20px; height: 18px;
+  background: #c87090;
+  border-radius: 50%;
+  position: absolute;
+  left: 50%; top: 4px;
+  transform: translateX(-50%);
+}
+.avatar-witch .hat {
+  width: 0; height: 0;
+  border-left: 12px solid transparent;
+  border-right: 12px solid transparent;
+  border-bottom: 20px solid #1a0030;
+  position: absolute;
+  left: 50%; top: -12px;
+  transform: translateX(-50%);
+}
+.avatar-witch .orb {
+  width: 12px; height: 12px;
+  background: radial-gradient(circle, #df80ff, #9b30d0);
+  border-radius: 50%;
+  position: absolute;
+  right: 4px; top: 24px;
+  box-shadow: 0 0 10px #9b59b6, 0 0 20px #9b59b6;
+  animation: orb-pulse 1.5s ease-in-out infinite;
+}
+.avatar-witch .particles {
+  position: absolute;
+  width: 60px; height: 60px;
+}
+.avatar-witch .particles::before,
+.avatar-witch .particles::after {
+  content: '✦';
+  position: absolute;
+  color: #9b59b6;
+  font-size: 8px;
+  animation: particle-float 2s ease-in-out infinite;
+}
+.avatar-witch .particles::before { top: 5px; left: 5px; animation-delay: 0s; }
+.avatar-witch .particles::after { top: 10px; right: 5px; animation-delay: 1s; }
+@keyframes witch-float {
+  0%, 100% { transform: translateY(0) rotate(-1deg); }
+  50% { transform: translateY(-5px) rotate(1deg); }
+}
+@keyframes orb-pulse {
+  0%, 100% { transform: scale(1); box-shadow: 0 0 10px #9b59b6; }
+  50% { transform: scale(1.3); box-shadow: 0 0 20px #9b59b6, 0 0 30px #9b59b6; }
+}
+@keyframes particle-float {
+  0%, 100% { opacity: 0; transform: translateY(0); }
+  50% { opacity: 1; transform: translateY(-8px); }
+}
+
+/* ШАМАН */
+.avatar-shaman {
+  animation: shaman-idle 2.5s ease-in-out infinite;
+}
+.avatar-shaman .body {
+  width: 24px; height: 30px;
+  background: linear-gradient(180deg, #1a4a1a, #0d2b0d);
+  border-radius: 4px;
+  position: absolute;
+  left: 50%; top: 18px;
+  transform: translateX(-50%);
+  border: 1px solid #2ECC71;
+}
+.avatar-shaman .head {
+  width: 20px; height: 20px;
+  background: #8B6914;
+  border-radius: 50%;
+  position: absolute;
+  left: 50%; top: 0;
+  transform: translateX(-50%);
+}
+.avatar-shaman .staff {
+  width: 4px; height: 40px;
+  background: linear-gradient(180deg, #5d3a1a, #3d2010);
+  position: absolute;
+  right: 8px; top: 10px;
+  border-radius: 2px;
+}
+.avatar-shaman .staff::before {
+  content: '';
+  width: 12px; height: 12px;
+  background: radial-gradient(circle, #7dff9b, #2ecc71);
+  border-radius: 50%;
+  position: absolute;
+  top: -8px; left: -4px;
+  box-shadow: 0 0 12px #2ecc71;
+  animation: staff-glow 1.5s ease-in-out infinite;
+}
+.avatar-shaman .aura {
+  position: absolute;
+  width: 50px; height: 50px;
+  top: 5px; left: 5px;
+  border-radius: 50%;
+  border: 1px solid rgba(46,204,113,0.3);
+  animation: aura-expand 2s ease-out infinite;
+}
+@keyframes shaman-idle {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-2px); }
+}
+@keyframes staff-glow {
+  0%, 100% { box-shadow: 0 0 8px #2ecc71; transform: scale(1); }
+  50% { box-shadow: 0 0 20px #2ecc71, 0 0 30px #2ecc71; transform: scale(1.2); }
+}
+@keyframes aura-expand {
+  0% { transform: scale(0.8); opacity: 0.6; }
+  100% { transform: scale(1.4); opacity: 0; }
+}
+
+/* БЕРСЕРК */
+.avatar-berserker {
+  animation: berserker-idle 0.8s ease-in-out infinite;
+}
+.avatar-berserker .body {
+  width: 30px; height: 32px;
+  background: linear-gradient(180deg, #5a1a1a, #3a0a0a);
+  border-radius: 4px 4px 2px 2px;
+  position: absolute;
+  left: 50%; top: 16px;
+  transform: translateX(-50%);
+  border: 1px solid #E74C3C;
+}
+.avatar-berserker .head {
+  width: 24px; height: 22px;
+  background: #8B4513;
+  border-radius: 40% 40% 50% 50%;
+  position: absolute;
+  left: 50%; top: -2px;
+  transform: translateX(-50%);
+}
+.avatar-berserker .axe {
+  width: 6px; height: 36px;
+  background: #666;
+  position: absolute;
+  right: 6px; top: 8px;
+  border-radius: 3px;
+}
+.avatar-berserker .axe::before {
+  content: '';
+  width: 16px; height: 14px;
+  background: linear-gradient(135deg, #aaa, #666);
+  border-radius: 2px 8px 2px 2px;
+  position: absolute;
+  top: 0; right: 0;
+}
+.avatar-berserker .rage-aura {
+  position: absolute;
+  width: 60px; height: 60px;
+  background: radial-gradient(circle, rgba(231,76,60,0.2) 0%, transparent 70%);
+  animation: rage-pulse 0.8s ease-in-out infinite;
+}
+@keyframes berserker-idle {
+  0%, 100% { transform: rotate(-2deg) translateY(0); }
+  50% { transform: rotate(2deg) translateY(-2px); }
+}
+@keyframes rage-pulse {
+  0%, 100% { opacity: 0.4; transform: scale(0.9); }
+  50% { opacity: 1; transform: scale(1.1); }
+}
+
+/* Большой аватар в меню */
+.hero-avatar-large {
+  width: 100px;
+  height: 100px;
+  transform: scale(1.6);
+  margin: 20px auto;
+}
+
+/* Аватар в карточке бойца */
+.hero-avatar-battle {
+  width: 44px;
+  height: 44px;
+  transform: scale(0.7);
+  margin: -4px auto -2px;
+}
+
+/* Умер — чёрно-белый */
+.fighter-card.dead .hero-avatar {
+  filter: grayscale(1);
+  animation: none !important;
+}

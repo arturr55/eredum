@@ -275,12 +275,12 @@ class GameRoom {
       }
 
       case 'spirit_heal': {
-        const t = target || fighter;
+        // Хилим самого раненого союзника или себя если нет союзников
+        const healTarget = allies.sort((a, b) => (a.hp/a.maxHp) - (b.hp/b.maxHp))[0] || fighter;
         const healAmt = Math.floor(fighter.hero.stats.atk * ability.effect.heal * bonus * multiplier);
-        t.hp = Math.min(t.maxHp, t.hp + healAmt);
-        this.log.push(`${fighter.username} лечит ${t.username} на ${healAmt} HP`);
-        // Пассивка Паладина — барьер если союзник ниже 20%
-        this.checkPaladinPassive(t);
+        healTarget.hp = Math.min(healTarget.maxHp, healTarget.hp + healAmt);
+        this.log.push(`${fighter.username} лечит ${healTarget.username} на ${healAmt} HP`);
+        this.checkPaladinPassive(healTarget);
         break;
       }
 
@@ -300,7 +300,42 @@ class GameRoom {
             a.spiritHealAmount = healPerTurn;
           }
         }
-        this.log.push(`${fighter.username} призывает духов-хранителей`);
+        this.log.push(`${fighter.username} призывает духов-хранителей (хил всей команде ${ability.effect.duration} хода)`);
+        break;
+      }
+
+      case 'nature_embrace': {
+        const selfHeal = Math.floor(fighter.maxHp * ability.effect.heal * bonus * multiplier);
+        fighter.hp = Math.min(fighter.maxHp, fighter.hp + selfHeal);
+        if (ability.effect.cleanse) {
+          fighter.stunned = 0;
+        }
+        this.log.push(`${fighter.username} восстанавливает себе ${selfHeal} HP и снимает негативные эффекты`);
+        break;
+      }
+
+      case 'team_restoration': {
+        const teamHeal = Math.floor(fighter.maxHp * ability.effect.heal * bonus * multiplier);
+        for (const a of [...allies, fighter]) {
+          if (a.hp > 0) a.hp = Math.min(a.maxHp, a.hp + teamHeal);
+        }
+        this.log.push(`${fighter.username} восстанавливает всей команде ${teamHeal} HP!`);
+        break;
+      }
+
+      case 'witch_self_heal': {
+        const witchHeal = Math.floor(fighter.hero.stats.atk * ability.effect.heal * bonus * multiplier);
+        fighter.hp = Math.min(fighter.maxHp, fighter.hp + witchHeal);
+        this.log.push(`${fighter.username} поглощает боль — восстанавливает ${witchHeal} HP`);
+        break;
+      }
+
+      case 'coven_ritual': {
+        const covenHeal = Math.floor(fighter.maxHp * ability.effect.heal * bonus * multiplier);
+        for (const a of [...allies, fighter]) {
+          if (a.hp > 0) a.hp = Math.min(a.maxHp, a.hp + covenHeal);
+        }
+        this.log.push(`${fighter.username} проводит ритуал ковена — вся команда восстанавливает ${covenHeal} HP`);
         break;
       }
 

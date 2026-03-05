@@ -31,6 +31,22 @@ let timerInterval = null;
 let selectedAbility = null;
 let roundReady = false;
 
+// CSS аватар героя
+function heroAvatar(heroId, size = '') {
+  const sizeClass = size ? `hero-avatar-${size}` : '';
+  return `<div class="hero-avatar ${sizeClass}">
+    <div class="avatar-${heroId}">
+      <div class="glow"></div>
+      <div class="body"></div>
+      <div class="head"></div>
+      ${heroId === 'paladin' ? '<div class="shield"></div>' : ''}
+      ${heroId === 'witch' ? '<div class="hat"></div><div class="orb"></div><div class="particles"></div>' : ''}
+      ${heroId === 'shaman' ? '<div class="staff"></div><div class="aura"></div>' : ''}
+      ${heroId === 'berserker' ? '<div class="axe"></div><div class="rage-aura"></div>' : ''}
+    </div>
+  </div>`;
+}
+
 // Показать экран
 function showScreen(id) {
   document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
@@ -132,7 +148,7 @@ function showHeroSelect() {
     const card = document.createElement('div');
     card.className = 'hero-card';
     card.innerHTML = `
-      <div class="hero-icon">${hero.icon}</div>
+      ${heroAvatar(hero.id)}
       <div class="hero-card-name" style="color:${hero.color}">${hero.name}</div>
       <div class="hero-card-role">${hero.role}</div>
     `;
@@ -181,7 +197,7 @@ function showMenu() {
   document.getElementById('menu-username').textContent = player.username;
   document.getElementById('menu-hero-name').textContent = hero.name;
   document.getElementById('menu-level').textContent = `Ур. ${currentHero.level}`;
-  document.getElementById('menu-hero-display').textContent = hero.icon;
+  document.getElementById('menu-hero-display').innerHTML = heroAvatar(currentHero.hero_id, 'large');
 
   document.getElementById('xp-bar').style.width = xpPercent + '%';
   document.getElementById('xp-label').textContent = `${currentHero.xp} / ${xpToLevel} XP`;
@@ -209,7 +225,7 @@ function showMenu() {
 // --- ОЧЕРЕДЬ ---
 function joinQueue() {
   showScreen('queue');
-  document.getElementById('queue-hero-icon').textContent = HEROES[currentHero.hero_id].icon;
+  document.getElementById('queue-hero-icon').innerHTML = heroAvatar(currentHero.hero_id);
   document.getElementById('queue-status').textContent = 'Ищем игроков...';
 
   document.getElementById('btn-leave-queue').onclick = () => {
@@ -333,7 +349,7 @@ function renderFighterRow(containerId, fighters, isAlly) {
 
     card.innerHTML = `
       ${isMe ? '<div class="me-badge">ТЫ</div>' : ''}
-      <div class="fighter-icon">${hero?.icon || '?'}</div>
+      ${hero ? heroAvatar(hero.id, 'battle') : '<div class="fighter-icon">?</div>'}
       <div class="fighter-name">${f.username}</div>
       <div class="hp-bar-wrap">
         <div class="hp-bar" style="width:${hpPct}%;background:${hpColor}"></div>

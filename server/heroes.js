@@ -82,6 +82,26 @@ const HEROES = {
         type: 'self_buff',
         target: 'self',
         effect: { hp_cost: 0.2, next_ability_multiplier: 2.0 }
+      },
+      {
+        id: 'witch_self_heal',
+        name: 'Поглощение боли',
+        description: 'Поглощает чужое проклятие — восстанавливает себе HP',
+        manaCost: 15,
+        cooldown: 3,
+        type: 'self_heal',
+        target: 'self',
+        effect: { heal: 0.8 }
+      },
+      {
+        id: 'coven_ritual',
+        name: 'Ритуал ковена',
+        description: 'Восстанавливает HP всей команде за счёт своей маны',
+        manaCost: 45,
+        cooldown: 5,
+        type: 'aoe_heal',
+        target: 'all_allies',
+        effect: { heal: 0.5 }
       }
     ],
     passive: {
@@ -101,11 +121,11 @@ const HEROES = {
       {
         id: 'spirit_heal',
         name: 'Исцеление духов',
-        description: 'Восстанавливает HP союзнику',
+        description: 'Восстанавливает HP союзнику или себе',
         manaCost: 20,
         cooldown: 0,
         type: 'heal',
-        target: 'ally',
+        target: 'ally_or_self',
         effect: { heal: 1.2 }
       },
       {
@@ -121,12 +141,32 @@ const HEROES = {
       {
         id: 'spirit_ward',
         name: 'Духи-хранители',
-        description: 'Призывает духов — хилят всю команду 3 хода',
+        description: 'Хилят всю команду включая себя 3 хода',
         manaCost: 40,
         cooldown: 5,
         type: 'aoe_heal',
         target: 'all_allies',
         effect: { heal_per_turn: 0.15, duration: 3 }
+      },
+      {
+        id: 'nature_embrace',
+        name: 'Объятия природы',
+        description: 'Мощный хил себе + снимает негативные эффекты',
+        manaCost: 25,
+        cooldown: 4,
+        type: 'self_heal',
+        target: 'self',
+        effect: { heal: 1.5, cleanse: true }
+      },
+      {
+        id: 'team_restoration',
+        name: 'Восстановление команды',
+        description: 'Хилит всю команду разом на значительную сумму',
+        manaCost: 50,
+        cooldown: 6,
+        type: 'aoe_heal',
+        target: 'all_allies',
+        effect: { heal: 0.8 }
       }
     ],
     passive: {
