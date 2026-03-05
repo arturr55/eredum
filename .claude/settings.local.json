@@ -1,0 +1,10 @@
+{
+  "permissions": {
+    "allow": [
+      "WebSearch",
+      "Bash(npm install 2>&1 | tail -5)",
+      "Bash(timeout 5 node server/index.js 2>&1 || true)",
+      "Bash(git init && git add . && git commit -m \"Initial commit: Eredum dark fantasy PvP game\")"
+    ]
+  }
+}

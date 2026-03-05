@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>ЭРЕДУМ</title>
+  <link rel="stylesheet" href="css/style.css">
+  <script src="https://telegram.org/js/telegram-web-app.js"></script>
+</head>
+<body>
+  <!-- Экран загрузки -->
+  <div id="screen-loading" class="screen active">
+    <div class="logo">ЭРЕДУМ</div>
+    <div class="subtitle">Тёмное фэнтези</div>
+    <div class="loader"></div>
+  </div>
+
+  <!-- Экран выбора героя -->
+  <div id="screen-hero-select" class="screen">
+    <h2>Выбери героя</h2>
+    <div class="hero-grid" id="hero-grid"></div>
+    <div class="hero-detail" id="hero-detail"></div>
+    <button class="btn-primary" id="btn-select-hero" disabled>Выбрать</button>
+  </div>
+
+  <!-- Главное меню -->
+  <div id="screen-menu" class="screen">
+    <div class="menu-header">
+      <div class="player-info">
+        <span id="menu-username"></span>
+        <span id="menu-hero-name"></span>
+        <span id="menu-level">Ур. 1</span>
+      </div>
+      <div class="xp-bar-wrap">
+        <div class="xp-bar" id="xp-bar"></div>
+        <span id="xp-label"></span>
+      </div>
+    </div>
+    <div class="menu-hero-display" id="menu-hero-display"></div>
+    <div class="menu-stats" id="menu-stats"></div>
+    <div class="menu-buttons">
+      <button class="btn-primary" id="btn-pvp">⚔️ PvP Бой</button>
+      <button class="btn-secondary" id="btn-change-hero">Сменить героя</button>
+    </div>
+    <div class="wins-info" id="wins-info"></div>
+  </div>
+
+  <!-- Экран поиска матча -->
+  <div id="screen-queue" class="screen">
+    <h2>Поиск матча</h2>
+    <div class="queue-animation">
+      <div class="pulse-ring"></div>
+      <div class="queue-hero" id="queue-hero-icon"></div>
+    </div>
+    <div class="queue-players" id="queue-players">
+      <div class="queue-slot">?</div>
+      <div class="queue-slot">?</div>
+      <div class="queue-slot">?</div>
+      <div class="queue-slot">?</div>
+    </div>
+    <p id="queue-status">Ищем игроков...</p>
+    <button class="btn-danger" id="btn-leave-queue">Отмена</button>
+  </div>
+
+  <!-- Экран боя -->
+  <div id="screen-battle" class="screen">
+    <div class="battle-top">
+      <div class="battle-turn" id="battle-turn">Ход 1</div>
+      <div class="battle-timer" id="battle-timer">30</div>
+    </div>
+
+    <!-- Враги -->
+    <div class="team-row" id="team-enemies">
+      <div class="team-label">Противники</div>
+      <div class="fighters-row" id="enemy-fighters"></div>
+    </div>
+
+    <!-- Лог боя -->
+    <div class="battle-log" id="battle-log"></div>
+
+    <!-- Союзники -->
+    <div class="team-row" id="team-allies">
+      <div class="team-label">Ваша команда</div>
+      <div class="fighters-row" id="ally-fighters"></div>
+    </div>
+
+    <!-- Способности -->
+    <div class="abilities-panel" id="abilities-panel">
+      <div class="abilities-label">Выбери способность:</div>
+      <div class="abilities-grid" id="abilities-grid"></div>
+    </div>
+
+    <div class="waiting-msg" id="waiting-msg" style="display:none">Ждём остальных...</div>
+  </div>
+
+  <!-- Экран результата -->
+  <div id="screen-result" class="screen">
+    <div class="result-title" id="result-title"></div>
+    <div class="result-rewards" id="result-rewards"></div>
+    <div class="result-log" id="result-log"></div>
+    <button class="btn-primary" id="btn-play-again">Играть снова</button>
+  </div>
+
+  <script src="/socket.io/socket.io.js"></script>
+  <script src="js/heroes.js"></script>
+  <script src="js/game.js"></script>
+</body>
+</html>

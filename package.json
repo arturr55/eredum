@@ -1,0 +1,19 @@
+{
+  "name": "eredum",
+  "version": "1.0.0",
+  "description": "Eredum - Dark Fantasy PvP Telegram Mini App",
+  "main": "server/index.js",
+  "scripts": {
+    "start": "node server/index.js",
+    "dev": "nodemon server/index.js"
+  },
+  "dependencies": {
+    "express": "^4.18.2",
+    "socket.io": "^4.6.1",
+    "better-sqlite3": "^9.4.3",
+    "cors": "^2.8.5"
+  },
+  "devDependencies": {
+    "nodemon": "^3.0.3"
+  }
+}
