@@ -42,6 +42,13 @@ db.exec(`
     purchased_at INTEGER DEFAULT (strftime('%s', 'now')),
     PRIMARY KEY (telegram_id, hero_id, skin_id)
   );
+
+  CREATE TABLE IF NOT EXISTS owned_items (
+    telegram_id TEXT,
+    item_id TEXT,
+    purchased_at INTEGER DEFAULT (strftime('%s', 'now')),
+    PRIMARY KEY (telegram_id, item_id)
+  );
 `);
 
 module.exports = {
@@ -128,6 +135,24 @@ module.exports = {
   addOwnedSkin(telegramId, heroId, skinId) {
     db.prepare('INSERT OR IGNORE INTO owned_skins (telegram_id, hero_id, skin_id) VALUES (?, ?, ?)')
       .run(telegramId, heroId, skinId);
+  },
+
+  getOwnedItems(telegramId) {
+    return db.prepare('SELECT item_id FROM owned_items WHERE telegram_id = ?')
+      .all(telegramId).map(r => r.item_id);
+  },
+
+  addOwnedItem(telegramId, itemId) {
+    db.prepare('INSERT OR IGNORE INTO owned_items (telegram_id, item_id) VALUES (?, ?)')
+      .run(telegramId, itemId);
+  },
+
+  addStars(telegramId, amount) {
+    db.prepare('UPDATE players SET stars = stars + ? WHERE telegram_id = ?').run(amount, telegramId);
+  },
+
+  deductStars(telegramId, amount) {
+    db.prepare('UPDATE players SET stars = MAX(0, stars - ?) WHERE telegram_id = ?').run(amount, telegramId);
   },
 
   upgradeAbility(telegramId, abilityIndex) {

@@ -224,6 +224,7 @@ function showMenu() {
   });
 
   document.getElementById('btn-upgrade').onclick = showUpgrade;
+  document.getElementById('btn-shop').onclick = showShop;
   document.getElementById('btn-pvp').onclick = joinQueue;
   document.getElementById('btn-change-hero').onclick = () => {
     selectedHeroId = null;
@@ -319,6 +320,105 @@ async function showUpgrade() {
 
   document.getElementById('btn-back-upgrade').onclick = showMenu;
   showScreen('upgrade');
+}
+
+// --- МАГАЗИН ---
+let shopData = null;
+let ownedData = null;
+let activeShopTab = 'skins';
+
+async function showShop() {
+  document.getElementById('btn-back-shop').onclick = showMenu;
+
+  // Загрузить данные магазина и купленного
+  [shopData, ownedData] = await Promise.all([
+    fetch('/api/shop').then(r => r.json()),
+    fetch(`/api/player/${player.telegram_id}/owned-items`).then(r => r.json())
+  ]);
+
+  // Обновить баланс Stars в шапке
+  document.getElementById('shop-stars').textContent = `⭐ ${player.stars || 0}`;
+
+  // Переключение вкладок
+  document.querySelectorAll('.shop-tab').forEach(tab => {
+    tab.onclick = () => {
+      document.querySelectorAll('.shop-tab').forEach(t => t.classList.remove('active'));
+      tab.classList.add('active');
+      activeShopTab = tab.dataset.tab;
+      renderShopItems();
+    };
+  });
+
+  renderShopItems();
+  showScreen('shop');
+}
+
+function renderShopItems() {
+  const container = document.getElementById('shop-items');
+  container.innerHTML = '';
+
+  const items = shopData[activeShopTab] || [];
+
+  items.forEach(item => {
+    const isOwned = activeShopTab === 'skins'
+      ? (ownedData.skins[item.heroId] || []).includes(item.id)
+      : ownedData.effects.includes(item.id);
+
+    const heroInfo = item.heroId ? HEROES[item.heroId] : null;
+
+    const card = document.createElement('div');
+    card.className = 'shop-item-card' + (isOwned ? ' owned' : '');
+    card.innerHTML = `
+      <div class="shop-item-preview">${item.preview}</div>
+      <div class="shop-item-info">
+        <div class="shop-item-name">${item.name}</div>
+        ${heroInfo ? `<div class="shop-item-hero" style="color:${heroInfo.color}">${heroInfo.icon} ${heroInfo.name}</div>` : ''}
+        <div class="shop-item-desc">${item.description}</div>
+      </div>
+      <div class="shop-item-action">
+        ${isOwned
+          ? `<div class="shop-owned-badge">✓ Есть</div>`
+          : `<button class="shop-buy-btn" data-id="${item.id}">⭐ ${item.price}</button>`
+        }
+      </div>
+    `;
+    container.appendChild(card);
+  });
+
+  // Обработчики кнопок покупки
+  container.querySelectorAll('.shop-buy-btn').forEach(btn => {
+    btn.addEventListener('click', () => purchaseItem(btn.dataset.id, btn));
+  });
+}
+
+async function purchaseItem(itemId, btn) {
+  btn.disabled = true;
+  btn.textContent = '...';
+
+  // В Telegram — используем openInvoice если доступно
+  // Сейчас: прямая покупка через сервер (тест-режим)
+  try {
+    const res = await fetch(`/api/player/${player.telegram_id}/purchase`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ itemId })
+    });
+    const result = await res.json();
+
+    if (result.error) {
+      showToast('❌ ' + result.error);
+      btn.disabled = false;
+      btn.textContent = '⭐ ' + shopData[activeShopTab].find(i => i.id === itemId)?.price;
+    } else {
+      showToast('✅ Куплено!');
+      // Обновить owned данные
+      ownedData = await fetch(`/api/player/${player.telegram_id}/owned-items`).then(r => r.json());
+      renderShopItems();
+    }
+  } catch (e) {
+    showToast('❌ Ошибка покупки');
+    btn.disabled = false;
+  }
 }
 
 // --- ОЧЕРЕДЬ ---

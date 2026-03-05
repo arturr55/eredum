@@ -5,7 +5,7 @@ const path = require('path');
 const cors = require('cors');
 const db = require('./db');
 const GameRoom = require('./GameRoom');
-const { getActiveSkin, getHeroSkins } = require('./skins');
+const { getActiveSkin, getHeroSkins, SHOP_ITEMS } = require('./skins');
 
 const app = express();
 const server = http.createServer(app);
@@ -70,6 +70,53 @@ app.post('/api/player/:telegramId/upgrade', (req, res) => {
   const { abilityIndex } = req.body;
   const result = db.upgradeAbility(req.params.telegramId, abilityIndex);
   res.json(result);
+});
+
+// REST API — магазин: все товары
+app.get('/api/shop', (req, res) => {
+  res.json(SHOP_ITEMS);
+});
+
+// REST API — купленные товары игрока
+app.get('/api/player/:telegramId/owned-items', (req, res) => {
+  const { telegramId } = req.params;
+  const heroes = ['witch', 'paladin', 'shaman', 'berserker'];
+  const skins = {};
+  heroes.forEach(h => { skins[h] = db.getOwnedSkins(telegramId, h); });
+  const effects = db.getOwnedItems(telegramId);
+  res.json({ skins, effects });
+});
+
+// REST API — купить товар (Stars)
+app.post('/api/player/:telegramId/purchase', (req, res) => {
+  const { telegramId } = req.params;
+  const { itemId } = req.body;
+
+  const player = db.getPlayer(telegramId);
+  if (!player) return res.status(404).json({ error: 'Игрок не найден' });
+
+  const allItems = [...SHOP_ITEMS.skins, ...SHOP_ITEMS.effects];
+  const item = allItems.find(i => i.id === itemId);
+  if (!item) return res.status(400).json({ error: 'Товар не найден' });
+
+  if (item.type === 'skin') {
+    const owned = db.getOwnedSkins(telegramId, item.heroId);
+    if (owned.includes(itemId)) return res.status(400).json({ error: 'Уже куплено' });
+    db.addOwnedSkin(telegramId, item.heroId, itemId);
+  } else {
+    const owned = db.getOwnedItems(telegramId);
+    if (owned.includes(itemId)) return res.status(400).json({ error: 'Уже куплено' });
+    db.addOwnedItem(telegramId, itemId);
+  }
+
+  res.json({ success: true });
+});
+
+// REST API — добавить тестовые Stars (только для отладки)
+app.post('/api/player/:telegramId/add-stars', (req, res) => {
+  const { amount = 100 } = req.body;
+  db.addStars(req.params.telegramId, amount);
+  res.json(db.getPlayer(req.params.telegramId));
 });
 
 // REST API — получить активный скин
