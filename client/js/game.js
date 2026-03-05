@@ -34,15 +34,23 @@ let roundReady = false;
 // CSS аватар героя
 function heroAvatar(heroId, size = '') {
   const sizeClass = size ? `hero-avatar-${size}` : '';
+  const isWitch = heroId === 'witch';
   return `<div class="hero-avatar ${sizeClass}">
     <div class="avatar-${heroId}">
-      <div class="glow"></div>
-      <div class="body"></div>
-      <div class="head"></div>
-      ${heroId === 'paladin' ? '<div class="shield"></div>' : ''}
-      ${heroId === 'witch' ? '<div class="hat"></div><div class="orb"></div><div class="particles"></div>' : ''}
-      ${heroId === 'shaman' ? '<div class="staff"></div><div class="aura"></div>' : ''}
-      ${heroId === 'berserker' ? '<div class="axe"></div><div class="rage-aura"></div>' : ''}
+      ${isWitch ? `
+        <div class="frame frame-1"></div>
+        <div class="frame frame-2"></div>
+        <div class="frame frame-3"></div>
+        <div class="frame frame-4"></div>
+        <div class="magic-overlay"></div>
+      ` : `
+        <div class="glow"></div>
+        <div class="body"></div>
+        <div class="head"></div>
+        ${heroId === 'paladin' ? '<div class="shield"></div>' : ''}
+        ${heroId === 'shaman' ? '<div class="staff"></div><div class="aura"></div>' : ''}
+        ${heroId === 'berserker' ? '<div class="axe"></div><div class="rage-aura"></div>' : ''}
+      `}
     </div>
   </div>`;
 }
