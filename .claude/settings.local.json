@@ -11,7 +11,8 @@
       "Bash(export PATH=\"$HOME/.local/bin:$PATH\" && gh repo create eredum --public --source=. --remote=origin --push 2>&1)",
       "Bash(git add -A && git commit -m \"Fix: уникальные имена для браузерных игроков\" && git push 2>&1)",
       "Bash(git add -A && git commit -m \"Улучшен экран результата: победители, XP, винрейт, лог\" && git push 2>&1)",
-      "Bash(git add -A && git commit -m \"Визуал: анимации ударов, плавающие цифры, цвет HP, бейдж ТЫ\" && git push 2>&1)"
+      "Bash(git add -A && git commit -m \"Визуал: анимации ударов, плавающие цифры, цвет HP, бейдж ТЫ\" && git push 2>&1)",
+      "Bash(git add -A && git commit -m \"Fix: мёртвые игроки не могут использовать способности\" && git push 2>&1)"
     ]
   }
 }

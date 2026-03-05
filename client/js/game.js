@@ -91,9 +91,18 @@ function initSocket() {
     startTimer(30);
     roundReady = false;
     selectedAbility = null;
-    enableAbilities(true);
     document.getElementById('waiting-msg').style.display = 'none';
     document.querySelectorAll('.fighter-card').forEach(c => c.classList.remove('ready-indicator'));
+
+    // Блокируем способности если игрок мёртв
+    const me = data.state[player.telegram_id];
+    if (me && me.hp <= 0) {
+      enableAbilities(false);
+      document.getElementById('waiting-msg').style.display = 'block';
+      document.getElementById('waiting-msg').textContent = '💀 Ты пал в бою...';
+    } else {
+      enableAbilities(true);
+    }
   });
 
   socket.on('turnEnd', (data) => {

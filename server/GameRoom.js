@@ -70,7 +70,8 @@ class GameRoom {
     for (const f of Object.values(this.fighters)) {
       f.chosenAbility = null;
       f.chosenTarget = null;
-      f.ready = false;
+      // Мёртвые автоматически пропускают ход
+      f.ready = f.hp <= 0;
     }
 
     this.io.to(this.roomId).emit('turnStart', {
@@ -87,7 +88,7 @@ class GameRoom {
 
   playerAction(telegramId, abilityIndex) {
     const fighter = this.fighters[telegramId];
-    if (!fighter || fighter.ready || this.gameOver) return;
+    if (!fighter || fighter.ready || this.gameOver || fighter.hp <= 0) return;
 
     // Автовыбор цели: первый живой враг
     const enemies = this.getEnemies(telegramId);
