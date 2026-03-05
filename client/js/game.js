@@ -30,6 +30,7 @@ let myTeam = null;
 let timerInterval = null;
 let selectedAbility = null;
 let roundReady = false;
+let selectedMode = '1v1';
 
 // CSS аватар героя
 function heroAvatar(heroId, size = '') {
@@ -95,8 +96,8 @@ async function init() {
 function initSocket() {
   socket = io();
 
-  socket.on('queueJoined', ({ position }) => {
-    updateQueueSlots(position);
+  socket.on('queueJoined', ({ position, mode, required }) => {
+    updateQueueSlots(position, required);
   });
 
   socket.on('playerReady', ({ telegramId, username }) => {
@@ -221,6 +222,15 @@ function showMenu() {
       ? `Винрейт: ${Math.floor((player.wins / (player.wins + player.losses)) * 100)}%`
       : 'Ещё не играл';
 
+  // Кнопки режима
+  document.querySelectorAll('.mode-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+      document.querySelectorAll('.mode-btn').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      selectedMode = btn.dataset.mode;
+    });
+  });
+
   document.getElementById('btn-pvp').onclick = joinQueue;
   document.getElementById('btn-change-hero').onclick = () => {
     selectedHeroId = null;
@@ -234,29 +244,31 @@ function showMenu() {
 function joinQueue() {
   showScreen('queue');
   document.getElementById('queue-hero-icon').innerHTML = heroAvatar(currentHero.hero_id);
-  document.getElementById('queue-status').textContent = 'Ищем игроков...';
+
+  const modeLabel = selectedMode === '1v1' ? '1 на 1' : '2 на 2';
+  document.getElementById('queue-status').textContent = `Режим: ${modeLabel} — ищем...`;
 
   document.getElementById('btn-leave-queue').onclick = () => {
     socket.emit('leaveQueue');
     showMenu();
   };
 
-  updateQueueSlots(0);
-  socket.emit('joinQueue', { telegramId: player.telegram_id, heroId: currentHero.hero_id });
+  const required = selectedMode === '1v1' ? 2 : 4;
+  updateQueueSlots(0, required);
+  socket.emit('joinQueue', { telegramId: player.telegram_id, heroId: currentHero.hero_id, mode: selectedMode });
 }
 
-function updateQueueSlots(count) {
-  const slots = document.querySelectorAll('.queue-slot');
-  slots.forEach((slot, i) => {
-    if (i < count) {
-      slot.classList.add('filled');
-      slot.textContent = '✓';
-    } else {
-      slot.classList.remove('filled');
-      slot.textContent = '?';
-    }
-  });
-  document.getElementById('queue-status').textContent = `Игроков: ${count}/4`;
+function updateQueueSlots(count, required = 4) {
+  const container = document.getElementById('queue-players');
+  container.innerHTML = '';
+  for (let i = 0; i < required; i++) {
+    const slot = document.createElement('div');
+    slot.className = 'queue-slot' + (i < count ? ' filled' : '');
+    slot.textContent = i < count ? '✓' : '?';
+    container.appendChild(slot);
+  }
+  const modeLabel = required === 2 ? '1 на 1' : '2 на 2';
+  document.getElementById('queue-status').textContent = `${modeLabel}: ${count}/${required} игроков`;
 }
 
 // --- БОЙ ---

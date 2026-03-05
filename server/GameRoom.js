@@ -4,16 +4,24 @@ const db = require('./db');
 const TURN_TIME = 30; // секунд на ход
 
 class GameRoom {
-  constructor(roomId, players, io) {
+  constructor(roomId, players, io, mode = '2v2') {
     this.roomId = roomId;
     this.io = io;
+    this.mode = mode;
     this.turnTimer = null;
 
-    // Инициализация двух команд: [0,1] vs [2,3]
-    this.teams = {
-      A: players.slice(0, 2),
-      B: players.slice(2, 4)
-    };
+    // 1v1: один против одного, 2v2: два против двух
+    if (mode === '1v1') {
+      this.teams = {
+        A: [players[0]],
+        B: [players[1]]
+      };
+    } else {
+      this.teams = {
+        A: players.slice(0, 2),
+        B: players.slice(2, 4)
+      };
+    }
 
     // Состояние каждого игрока в бою
     this.fighters = {};

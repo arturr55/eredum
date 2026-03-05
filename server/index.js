@@ -17,8 +17,8 @@ app.use(cors());
 app.use(express.json());
 app.use(express.static(path.join(__dirname, '../client')));
 
-// Очередь матчмейкинга: { socketId, heroId, userId, level }
-let queue = [];
+// Очереди матчмейкинга по режиму
+const queues = { '1v1': [], '2v2': [] };
 
 // Активные комнаты
 const rooms = {};
@@ -79,26 +79,33 @@ io.on('connection', (socket) => {
   console.log('Подключился:', socket.id);
 
   // Игрок входит в матчмейкинг
-  socket.on('joinQueue', ({ telegramId, heroId }) => {
+  socket.on('joinQueue', ({ telegramId, mode = '2v2' }) => {
     const player = db.getPlayer(telegramId);
     if (!player) return socket.emit('error', 'Игрок не найден');
 
     const hero = db.getPlayerHero(telegramId);
     if (!hero) return socket.emit('error', 'Герой не выбран');
 
-    // Убрать из очереди если уже был
-    queue = queue.filter(q => q.socketId !== socket.id);
+    const validMode = mode === '1v1' ? '1v1' : '2v2';
+    const queue = queues[validMode];
 
-    queue.push({ socketId: socket.id, telegramId, heroId: hero.hero_id, username: player.username, level: hero.level });
-    socket.emit('queueJoined', { position: queue.length });
+    // Убрать из всех очередей если уже был
+    queues['1v1'] = queues['1v1'].filter(q => q.socketId !== socket.id);
+    queues['2v2'] = queues['2v2'].filter(q => q.socketId !== socket.id);
 
-    console.log(`Очередь: ${queue.length}/4`);
+    const entry = { socketId: socket.id, telegramId, heroId: hero.hero_id, username: player.username, level: hero.level, mode: validMode };
+    queue.push(entry);
+    socket.data.mode = validMode;
 
-    // Если 4 игрока — запускаем бой
-    if (queue.length >= 4) {
-      const players = queue.splice(0, 4);
+    socket.emit('queueJoined', { position: queue.length, mode: validMode, required: validMode === '1v1' ? 2 : 4 });
+    console.log(`Очередь ${validMode}: ${queue.length}`);
+
+    const required = validMode === '1v1' ? 2 : 4;
+
+    if (queue.length >= required) {
+      const players = queue.splice(0, required);
       const roomId = `room_${Date.now()}`;
-      const room = new GameRoom(roomId, players, io);
+      const room = new GameRoom(roomId, players, io, validMode);
       rooms[roomId] = room;
 
       players.forEach(p => {
@@ -123,11 +130,13 @@ io.on('connection', (socket) => {
 
   // Покинуть очередь
   socket.on('leaveQueue', () => {
-    queue = queue.filter(q => q.socketId !== socket.id);
+    queues['1v1'] = queues['1v1'].filter(q => q.socketId !== socket.id);
+    queues['2v2'] = queues['2v2'].filter(q => q.socketId !== socket.id);
   });
 
   socket.on('disconnect', () => {
-    queue = queue.filter(q => q.socketId !== socket.id);
+    queues['1v1'] = queues['1v1'].filter(q => q.socketId !== socket.id);
+    queues['2v2'] = queues['2v2'].filter(q => q.socketId !== socket.id);
     const roomId = socket.data.roomId;
     if (roomId && rooms[roomId]) {
       rooms[roomId].playerDisconnected(socket.data.telegramId);
