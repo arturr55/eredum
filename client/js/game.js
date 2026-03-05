@@ -373,26 +373,55 @@ async function showResult(data) {
   });
   player = await pRes.json();
 
+  const xpToLevel = currentHero.level * 150;
+  const xpPercent = Math.min(100, Math.floor((currentHero.xp / xpToLevel) * 100));
+  const xpGained = isWinner ? 100 : 25;
+
+  // Победители и проигравшие
+  const finalState = data.finalState || {};
+  const winnerNames = data.winners.map(tid => finalState[tid]?.username || '?');
+  const loserNames = data.losers.map(tid => finalState[tid]?.username || '?');
+
   const titleEl = document.getElementById('result-title');
   titleEl.className = 'result-title ' + (isWinner ? 'win' : 'lose');
-  titleEl.textContent = isWinner ? '🏆 ПОБЕДА!' : '💀 ПОРАЖЕНИЕ';
+  titleEl.innerHTML = isWinner ? '🏆 ПОБЕДА!' : '💀 ПОРАЖЕНИЕ';
 
   const rewardsEl = document.getElementById('result-rewards');
-  const xpGained = isWinner ? 100 : 25;
   rewardsEl.innerHTML = `
-    <div class="reward-item">+${xpGained} XP</div>
-    ${myResult?.levelUp ? '<div class="level-up-notice">🎉 НОВЫЙ УРОВЕНЬ!</div>' : ''}
-    <div class="reward-item" style="color:var(--text2);font-size:13px">
-      Победы: ${player.wins} | Поражения: ${player.losses || 0}
+    <div style="display:flex;justify-content:space-between;margin-bottom:14px">
+      <div style="text-align:center;flex:1">
+        <div style="font-size:11px;color:var(--text2);margin-bottom:4px">ПОБЕДИТЕЛИ</div>
+        ${winnerNames.map(n => `<div style="color:var(--gold);font-weight:700">${n}</div>`).join('')}
+      </div>
+      <div style="font-size:24px;align-self:center">⚔️</div>
+      <div style="text-align:center;flex:1">
+        <div style="font-size:11px;color:var(--text2);margin-bottom:4px">ПРОИГРАВШИЕ</div>
+        ${loserNames.map(n => `<div style="color:var(--accent)">${n}</div>`).join('')}
+      </div>
+    </div>
+    <div style="border-top:1px solid var(--border);padding-top:12px">
+      <div style="font-size:13px;color:var(--text2);margin-bottom:6px">Твой герой: ${HEROES[currentHero.hero_id]?.icon} ${HEROES[currentHero.hero_id]?.name} — Ур. ${currentHero.level}</div>
+      <div style="font-size:18px;color:var(--green);font-weight:700;margin-bottom:8px">+${xpGained} XP</div>
+      ${myResult?.levelUp ? '<div class="level-up-notice">🎉 НОВЫЙ УРОВЕНЬ!</div>' : ''}
+      <div class="xp-bar-wrap" style="margin:8px 0">
+        <div class="xp-bar" style="width:${xpPercent}%"></div>
+        <span id="xp-label">${currentHero.xp} / ${xpToLevel} XP</span>
+      </div>
+      <div style="display:flex;justify-content:center;gap:20px;margin-top:10px;font-size:13px">
+        <div>🏆 Побед: <strong style="color:var(--gold)">${player.wins}</strong></div>
+        <div>💀 Поражений: <strong style="color:var(--accent)">${player.losses || 0}</strong></div>
+        <div>📊 Винрейт: <strong>${player.wins + (player.losses||0) > 0 ? Math.floor(player.wins/(player.wins+(player.losses||0))*100) : 0}%</strong></div>
+      </div>
     </div>
   `;
 
   const logEl = document.getElementById('result-log');
-  logEl.innerHTML = (data.log || []).map(l => `<div>${l}</div>`).join('');
+  logEl.innerHTML = `
+    <div style="font-size:11px;color:var(--text2);margin-bottom:6px;text-transform:uppercase;letter-spacing:1px">Лог боя</div>
+    ${(data.log || []).map(l => `<div>${l}</div>`).join('')}
+  `;
 
-  document.getElementById('btn-play-again').onclick = () => {
-    showMenu();
-  };
+  document.getElementById('btn-play-again').onclick = () => showMenu();
 
   showScreen('result');
 }
