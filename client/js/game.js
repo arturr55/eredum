@@ -244,10 +244,52 @@ function showBattle(data) {
 }
 
 function updateBattleUI(data) {
+  const prevState = { ...battleState };
   battleState = data.state;
   document.getElementById('battle-turn').textContent = `Ход ${data.turn}`;
+
+  // Анимируем изменения HP перед рендером
+  Object.values(battleState).forEach(f => {
+    const prev = prevState[f.telegramId];
+    if (prev && prev.hp > f.hp && f.hp >= 0) {
+      const dmg = prev.hp - f.hp;
+      scheduleHitAnimation(f.telegramId, dmg);
+    }
+    if (prev && prev.hp < f.hp) {
+      scheduleHealAnimation(f.telegramId, f.hp - prev.hp);
+    }
+  });
+
   renderFighters();
   if (data.log) updateBattleLog(data.log);
+}
+
+function scheduleHitAnimation(tid, dmg) {
+  setTimeout(() => {
+    const card = document.querySelector(`[data-tid="${tid}"]`);
+    if (!card) return;
+    card.classList.add('hit-flash');
+    setTimeout(() => card.classList.remove('hit-flash'), 400);
+    showFloatingText(card, `-${dmg}`, 'dmg-float');
+  }, 100);
+}
+
+function scheduleHealAnimation(tid, amount) {
+  setTimeout(() => {
+    const card = document.querySelector(`[data-tid="${tid}"]`);
+    if (!card) return;
+    card.classList.add('heal-flash');
+    setTimeout(() => card.classList.remove('heal-flash'), 400);
+    showFloatingText(card, `+${amount}`, 'heal-float');
+  }, 100);
+}
+
+function showFloatingText(card, text, cls) {
+  const el = document.createElement('div');
+  el.className = `floating-text ${cls}`;
+  el.textContent = text;
+  card.appendChild(el);
+  setTimeout(() => el.remove(), 1000);
 }
 
 function renderFighters() {
@@ -271,24 +313,27 @@ function renderFighterRow(containerId, fighters, isAlly) {
     const card = document.createElement('div');
     card.className = 'fighter-card' + (f.hp <= 0 ? ' dead' : '') + (f.ready ? ' ready-indicator' : '');
     card.dataset.tid = f.telegramId;
+    if (hero?.color) card.style.borderColor = f.hp > 0 ? hero.color + '55' : '';
 
     const statusIcons = [];
-    if (f.stunned > 0) statusIcons.push('😵');
-    if (f.barrier > 0) statusIcons.push('🛡');
-    if (f.rage > 0) statusIcons.push(`😤${f.rage}`);
+    if (f.stunned > 0) statusIcons.push('<span title="Оглушён">😵</span>');
+    if (f.barrier > 0) statusIcons.push(`<span title="Барьер">🛡${f.barrier}</span>`);
+    if (f.rage > 0) statusIcons.push(`<span title="Ярость">😤${f.rage}</span>`);
+
+    const hpColor = hpPct > 50 ? 'var(--green)' : hpPct > 25 ? 'var(--gold)' : 'var(--accent)';
 
     card.innerHTML = `
-      ${f.barrier > 0 ? `<div class="barrier-badge">🛡</div>` : ''}
+      ${isMe ? '<div class="me-badge">ТЫ</div>' : ''}
       <div class="fighter-icon">${hero?.icon || '?'}</div>
-      <div class="fighter-name">${isMe ? '(Ты) ' : ''}${f.username}</div>
+      <div class="fighter-name">${f.username}</div>
       <div class="hp-bar-wrap">
-        <div class="hp-bar ${hpPct < 30 ? 'low' : ''}" style="width:${hpPct}%"></div>
+        <div class="hp-bar" style="width:${hpPct}%;background:${hpColor}"></div>
       </div>
       <div class="hp-text">${f.hp}/${f.maxHp}</div>
       <div class="mana-bar-wrap">
         <div class="mana-bar" style="width:${manaPct}%"></div>
       </div>
-      <div class="status-icons">${statusIcons.join(' ')}</div>
+      <div class="status-icons">${statusIcons.join('')}</div>
     `;
     container.appendChild(card);
   });

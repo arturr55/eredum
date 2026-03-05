@@ -420,6 +420,20 @@ body {
   margin-top: 2px;
 }
 .status-icon { font-size: 10px; }
+.me-badge {
+  position: absolute;
+  top: -8px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: var(--accent2);
+  color: #fff;
+  font-size: 8px;
+  font-weight: 900;
+  padding: 1px 6px;
+  border-radius: 6px;
+  letter-spacing: 1px;
+}
+
 .barrier-badge {
   position: absolute;
   top: -6px;
@@ -434,6 +448,64 @@ body {
   justify-content: center;
   color: #000;
   font-weight: 700;
+}
+
+/* Анимации ударов и хила */
+.hit-flash {
+  animation: hit-anim 0.4s ease;
+}
+@keyframes hit-anim {
+  0% { transform: scale(1); background: var(--bg2); }
+  20% { transform: scale(0.93); background: rgba(192,57,43,0.5); }
+  100% { transform: scale(1); background: var(--bg2); }
+}
+
+.heal-flash {
+  animation: heal-anim 0.4s ease;
+}
+@keyframes heal-anim {
+  0% { transform: scale(1); }
+  20% { transform: scale(1.06); background: rgba(39,174,96,0.4); }
+  100% { transform: scale(1); }
+}
+
+/* Плавающие цифры урона/хила */
+.floating-text {
+  position: absolute;
+  top: -10px;
+  left: 50%;
+  transform: translateX(-50%);
+  font-size: 14px;
+  font-weight: 900;
+  pointer-events: none;
+  z-index: 100;
+  animation: float-up 1s ease forwards;
+  white-space: nowrap;
+}
+.dmg-float { color: #e74c3c; text-shadow: 0 0 6px rgba(231,76,60,0.8); }
+.heal-float { color: #2ecc71; text-shadow: 0 0 6px rgba(46,204,113,0.8); }
+
+@keyframes float-up {
+  0% { opacity: 1; transform: translateX(-50%) translateY(0); }
+  100% { opacity: 0; transform: translateX(-50%) translateY(-40px); }
+}
+
+/* Смерть бойца */
+.fighter-card.dead {
+  opacity: 0.3;
+  filter: grayscale(1);
+  animation: death-anim 0.5s ease;
+}
+@keyframes death-anim {
+  0% { transform: scale(1); }
+  50% { transform: scale(0.85) rotate(-3deg); }
+  100% { transform: scale(1) rotate(0); }
+}
+
+/* Готов к ходу */
+.fighter-card.ready-indicator {
+  border-color: var(--green);
+  box-shadow: 0 0 10px rgba(39,174,96,0.3);
 }
 
 /* BATTLE LOG */
