@@ -4,7 +4,22 @@ const tg = window.Telegram?.WebApp;
 if (tg) { tg.expand(); tg.setHeaderColor('#0d0d0d'); }
 
 // Telegram user данные
-const telegramUser = tg?.initDataUnsafe?.user || { id: 'test_' + Math.random().toString(36).slice(2), first_name: 'Игрок' };
+const DARK_NAMES = [
+  'Азраэль', 'Морвен', 'Кайрон', 'Зарин', 'Лютар',
+  'Севира', 'Дракос', 'Нирайя', 'Вортан', 'Эльдрис',
+  'Малгор', 'Ксарина', 'Торвал', 'Диаса', 'Кревис'
+];
+
+function getOrCreateBrowserUser() {
+  let stored = localStorage.getItem('eredum_user');
+  if (stored) return JSON.parse(stored);
+  const name = DARK_NAMES[Math.floor(Math.random() * DARK_NAMES.length)];
+  const user = { id: 'browser_' + Math.random().toString(36).slice(2), first_name: name };
+  localStorage.setItem('eredum_user', JSON.stringify(user));
+  return user;
+}
+
+const telegramUser = tg?.initDataUnsafe?.user || getOrCreateBrowserUser();
 
 let socket;
 let player = null;
