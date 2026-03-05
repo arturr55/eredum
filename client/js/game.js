@@ -231,6 +231,7 @@ function showMenu() {
     });
   });
 
+  document.getElementById('btn-upgrade').onclick = showUpgrade;
   document.getElementById('btn-pvp').onclick = joinQueue;
   document.getElementById('btn-change-hero').onclick = () => {
     selectedHeroId = null;
@@ -238,6 +239,94 @@ function showMenu() {
   };
 
   showScreen('menu');
+}
+
+// --- ПРОКАЧКА ---
+async function showUpgrade() {
+  const hero = HEROES[currentHero.hero_id];
+
+  document.getElementById('upgrade-hero-display').innerHTML = heroAvatar(currentHero.hero_id, 'large');
+  document.getElementById('upgrade-shards').textContent = `⚫ ${player.shards || 0} осколков`;
+
+  const abilitiesEl = document.getElementById('upgrade-abilities');
+  abilitiesEl.innerHTML = '';
+
+  const abilityKeys = ['ability1_level', 'ability2_level', 'ability3_level'];
+
+  hero.abilities.forEach((ab, i) => {
+    const currentLevel = currentHero[abilityKeys[i]] || 1;
+    const maxLevel = 5;
+    const cost = currentLevel * 50;
+    const canAfford = (player.shards || 0) >= cost;
+    const isMax = currentLevel >= maxLevel;
+
+    const card = document.createElement('div');
+    card.className = 'upgrade-card';
+    card.innerHTML = `
+      <div class="upgrade-card-left">
+        <div class="upgrade-ability-icon">${ab.icon}</div>
+        <div class="upgrade-ability-info">
+          <div class="upgrade-ability-name">${ab.name}</div>
+          <div class="upgrade-ability-desc">${ab.desc}</div>
+          <div class="upgrade-level-dots">
+            ${Array.from({length: maxLevel}, (_, j) =>
+              `<div class="level-dot ${j < currentLevel ? 'filled' : ''}"></div>`
+            ).join('')}
+          </div>
+        </div>
+      </div>
+      <div class="upgrade-card-right">
+        <div class="upgrade-level-badge">Ур. ${currentLevel}</div>
+        ${isMax
+          ? `<div class="upgrade-max">МАКС</div>`
+          : `<button class="upgrade-btn ${canAfford ? '' : 'cant-afford'}" data-index="${i}">
+              ${canAfford ? `⬆️ ${cost}⚫` : `🔒 ${cost}⚫`}
+            </button>`
+        }
+      </div>
+    `;
+    abilitiesEl.appendChild(card);
+  });
+
+  // Пассивка
+  document.getElementById('upgrade-passive').innerHTML = `
+    <div class="passive-info">
+      <span class="passive-icon">${hero.passive.icon}</span>
+      <div>
+        <div class="passive-name">${hero.passive.name}</div>
+        <div class="passive-desc">${hero.passive.desc}</div>
+      </div>
+    </div>
+  `;
+
+  // Обработчики кнопок прокачки
+  abilitiesEl.querySelectorAll('.upgrade-btn').forEach(btn => {
+    btn.addEventListener('click', async () => {
+      const index = parseInt(btn.dataset.index);
+      const res = await fetch(`/api/player/${player.telegram_id}/upgrade`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ abilityIndex: index })
+      });
+      const result = await res.json();
+      if (result.error) {
+        showToast(result.error);
+      } else {
+        showToast(`✅ Прокачано до уровня ${result.newLevel}!`);
+        // Обновляем данные
+        currentHero = await (await fetch(`/api/player/${player.telegram_id}/hero`)).json();
+        player = await (await fetch('/api/player', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ telegramId: player.telegram_id, username: player.username })
+        })).json();
+        showUpgrade();
+      }
+    });
+  });
+
+  document.getElementById('btn-back-upgrade').onclick = showMenu;
+  showScreen('upgrade');
 }
 
 // --- ОЧЕРЕДЬ ---
@@ -491,7 +580,10 @@ async function showResult(data) {
     </div>
     <div style="border-top:1px solid var(--border);padding-top:12px">
       <div style="font-size:13px;color:var(--text2);margin-bottom:6px">Твой герой: ${HEROES[currentHero.hero_id]?.icon} ${HEROES[currentHero.hero_id]?.name} — Ур. ${currentHero.level}</div>
-      <div style="font-size:18px;color:var(--green);font-weight:700;margin-bottom:8px">+${xpGained} XP</div>
+      <div style="display:flex;gap:16px;justify-content:center;margin-bottom:8px">
+      <div style="font-size:18px;color:var(--green);font-weight:700">+${xpGained} XP</div>
+      <div style="font-size:18px;color:#aaa;font-weight:700">+${isWinner ? 30 : 10} ⚫</div>
+    </div>
       ${myResult?.levelUp ? '<div class="level-up-notice">🎉 НОВЫЙ УРОВЕНЬ!</div>' : ''}
       <div class="xp-bar-wrap" style="margin:8px 0">
         <div class="xp-bar" style="width:${xpPercent}%"></div>

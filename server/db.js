@@ -10,6 +10,7 @@ db.exec(`
     telegram_id TEXT PRIMARY KEY,
     username TEXT,
     stars INTEGER DEFAULT 0,
+    shards INTEGER DEFAULT 0,
     wins INTEGER DEFAULT 0,
     losses INTEGER DEFAULT 0,
     created_at INTEGER DEFAULT (strftime('%s', 'now'))
@@ -76,8 +77,8 @@ module.exports = {
     const hero = this.getPlayerHero(telegramId);
     if (!hero) return;
 
-    // Опыт за победу
     const xpGain = 100;
+    const shardsGain = 30; // Осколки за победу
     const newXp = hero.xp + xpGain;
     const xpToLevel = hero.level * 150;
     let newLevel = hero.level;
@@ -88,27 +89,24 @@ module.exports = {
       remainingXp = newXp - xpToLevel;
     }
 
-    db.prepare(`
-      UPDATE player_heroes SET xp = ?, level = ?
-      WHERE telegram_id = ? AND hero_id = ?
-    `).run(remainingXp, newLevel, telegramId, hero.hero_id);
+    db.prepare(`UPDATE player_heroes SET xp = ?, level = ? WHERE telegram_id = ? AND hero_id = ?`)
+      .run(remainingXp, newLevel, telegramId, hero.hero_id);
+    db.prepare('UPDATE players SET wins = wins + 1, shards = shards + ? WHERE telegram_id = ?')
+      .run(shardsGain, telegramId);
 
-    db.prepare('UPDATE players SET wins = wins + 1 WHERE telegram_id = ?').run(telegramId);
-
-    return { newLevel, newXp: remainingXp, levelUp: newLevel > hero.level };
+    return { newLevel, newXp: remainingXp, levelUp: newLevel > hero.level, shardsGain };
   },
 
   addLoss(telegramId) {
-    const xpGain = 25; // Небольшой опыт за поражение
     const hero = this.getPlayerHero(telegramId);
     if (!hero) return;
+    const xpGain = 25;
+    const shardsGain = 10; // Небольшие осколки за поражение
 
-    db.prepare(`
-      UPDATE player_heroes SET xp = xp + ?
-      WHERE telegram_id = ? AND hero_id = ?
-    `).run(xpGain, telegramId, hero.hero_id);
-
-    db.prepare('UPDATE players SET losses = losses + 1 WHERE telegram_id = ?').run(telegramId);
+    db.prepare(`UPDATE player_heroes SET xp = xp + ? WHERE telegram_id = ? AND hero_id = ?`)
+      .run(xpGain, telegramId, hero.hero_id);
+    db.prepare('UPDATE players SET losses = losses + 1, shards = shards + ? WHERE telegram_id = ?')
+      .run(shardsGain, telegramId);
   },
 
   getPlayerHeroById(telegramId, heroId) {
@@ -134,10 +132,24 @@ module.exports = {
 
   upgradeAbility(telegramId, abilityIndex) {
     const hero = this.getPlayerHero(telegramId);
-    if (!hero) return null;
+    if (!hero) return { error: 'Герой не найден' };
+
     const col = `ability${abilityIndex + 1}_level`;
+    const currentLevel = hero[col];
+    const maxLevel = 5;
+
+    if (currentLevel >= maxLevel) return { error: 'Максимальный уровень' };
+
+    // Стоимость: уровень × 50 осколков
+    const cost = currentLevel * 50;
+    const player = this.getPlayer(telegramId);
+    if (!player || player.shards < cost) return { error: `Нужно ${cost} осколков` };
+
     db.prepare(`UPDATE player_heroes SET ${col} = ${col} + 1 WHERE telegram_id = ? AND hero_id = ?`)
       .run(telegramId, hero.hero_id);
-    return this.getPlayerHero(telegramId);
+    db.prepare('UPDATE players SET shards = shards - ? WHERE telegram_id = ?')
+      .run(cost, telegramId);
+
+    return { success: true, cost, newLevel: currentLevel + 1 };
   }
 };

@@ -65,6 +65,13 @@ app.post('/api/player/:telegramId/skin', (req, res) => {
   res.json(result);
 });
 
+// REST API — прокачать способность
+app.post('/api/player/:telegramId/upgrade', (req, res) => {
+  const { abilityIndex } = req.body;
+  const result = db.upgradeAbility(req.params.telegramId, abilityIndex);
+  res.json(result);
+});
+
 // REST API — получить активный скин
 app.get('/api/player/:telegramId/active-skin/:heroId', (req, res) => {
   const { telegramId, heroId } = req.params;

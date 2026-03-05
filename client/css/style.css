@@ -226,6 +226,125 @@ body {
   text-align: center;
 }
 
+/* ПРОКАЧКА */
+#screen-upgrade { gap: 12px; padding-top: 16px; }
+
+.upgrade-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+}
+.upgrade-header h2 { font-size: 18px; color: var(--gold); }
+.upgrade-shards { font-size: 13px; color: var(--text2); }
+.btn-back {
+  background: none;
+  border: none;
+  color: var(--text2);
+  font-size: 14px;
+  cursor: pointer;
+  padding: 4px 8px;
+}
+
+.upgrade-abilities {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  width: 100%;
+  max-width: 420px;
+}
+
+.upgrade-card {
+  background: var(--bg2);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+}
+.upgrade-card-left {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex: 1;
+}
+.upgrade-ability-icon { font-size: 26px; min-width: 32px; text-align: center; }
+.upgrade-ability-name { font-size: 13px; font-weight: 700; margin-bottom: 2px; }
+.upgrade-ability-desc { font-size: 11px; color: var(--text2); margin-bottom: 6px; }
+
+.upgrade-level-dots {
+  display: flex;
+  gap: 4px;
+}
+.level-dot {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background: var(--border);
+  border: 1px solid var(--text2);
+}
+.level-dot.filled {
+  background: var(--gold);
+  border-color: var(--gold);
+  box-shadow: 0 0 4px rgba(243,156,18,0.5);
+}
+
+.upgrade-card-right {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  min-width: 70px;
+}
+.upgrade-level-badge {
+  font-size: 11px;
+  color: var(--text2);
+  background: var(--bg3);
+  padding: 2px 8px;
+  border-radius: 10px;
+}
+.upgrade-btn {
+  background: var(--accent);
+  color: #fff;
+  border: none;
+  border-radius: 8px;
+  padding: 8px 10px;
+  font-size: 12px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.2s;
+  white-space: nowrap;
+}
+.upgrade-btn:active { transform: scale(0.95); }
+.upgrade-btn.cant-afford {
+  background: var(--bg3);
+  color: var(--text2);
+  cursor: not-allowed;
+}
+.upgrade-max {
+  font-size: 11px;
+  color: var(--gold);
+  font-weight: 700;
+  letter-spacing: 1px;
+}
+
+.passive-info {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  background: var(--bg2);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 12px;
+  width: 100%;
+  max-width: 420px;
+}
+.passive-icon { font-size: 24px; }
+.passive-name { font-size: 13px; font-weight: 700; color: var(--accent2); }
+.passive-desc { font-size: 11px; color: var(--text2); margin-top: 2px; }
+
 /* Выбор режима */
 .mode-select {
   display: flex;
