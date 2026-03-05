@@ -71,10 +71,10 @@
   opacity: 0;
   transition: opacity 0.3s ease;
 }
-.avatar-witch .frame-1 { background-image: url('/assets/witch1.jpg'); }
-.avatar-witch .frame-2 { background-image: url('/assets/witch2.jpg'); }
-.avatar-witch .frame-3 { background-image: url('/assets/witch3.jpg'); }
-.avatar-witch .frame-4 { background-image: url('/assets/witch4.jpg'); }
+.avatar-witch .frame-1 { background-image: url('/assets/heroes/witch/default/witch1.jpg'); }
+.avatar-witch .frame-2 { background-image: url('/assets/heroes/witch/default/witch2.jpg'); }
+.avatar-witch .frame-3 { background-image: url('/assets/heroes/witch/default/witch3.jpg'); }
+.avatar-witch .frame-4 { background-image: url('/assets/heroes/witch/default/witch4.jpg'); }
 
 /* Анимация через opacity — плавный переход между кадрами */
 .avatar-witch .frame-1 { animation: witch-frame1 3.2s ease-in-out infinite; }

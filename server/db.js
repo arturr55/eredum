@@ -33,6 +33,14 @@ db.exec(`
     hero_id TEXT,
     FOREIGN KEY (telegram_id) REFERENCES players(telegram_id)
   );
+
+  CREATE TABLE IF NOT EXISTS owned_skins (
+    telegram_id TEXT,
+    hero_id TEXT,
+    skin_id TEXT,
+    purchased_at INTEGER DEFAULT (strftime('%s', 'now')),
+    PRIMARY KEY (telegram_id, hero_id, skin_id)
+  );
 `);
 
 module.exports = {
@@ -101,6 +109,27 @@ module.exports = {
     `).run(xpGain, telegramId, hero.hero_id);
 
     db.prepare('UPDATE players SET losses = losses + 1 WHERE telegram_id = ?').run(telegramId);
+  },
+
+  getPlayerHeroById(telegramId, heroId) {
+    return db.prepare('SELECT * FROM player_heroes WHERE telegram_id = ? AND hero_id = ?')
+      .get(telegramId, heroId);
+  },
+
+  getOwnedSkins(telegramId, heroId) {
+    return db.prepare('SELECT skin_id FROM owned_skins WHERE telegram_id = ? AND hero_id = ?')
+      .all(telegramId, heroId).map(r => r.skin_id);
+  },
+
+  equipSkin(telegramId, heroId, skinId) {
+    db.prepare('UPDATE player_heroes SET skin_id = ? WHERE telegram_id = ? AND hero_id = ?')
+      .run(skinId, telegramId, heroId);
+    return this.getPlayerHeroById(telegramId, heroId);
+  },
+
+  addOwnedSkin(telegramId, heroId, skinId) {
+    db.prepare('INSERT OR IGNORE INTO owned_skins (telegram_id, hero_id, skin_id) VALUES (?, ?, ?)')
+      .run(telegramId, heroId, skinId);
   },
 
   upgradeAbility(telegramId, abilityIndex) {

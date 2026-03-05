@@ -5,6 +5,7 @@ const path = require('path');
 const cors = require('cors');
 const db = require('./db');
 const GameRoom = require('./GameRoom');
+const { getActiveSkin, getHeroSkins } = require('./skins');
 
 const app = express();
 const server = http.createServer(app);
@@ -45,6 +46,32 @@ app.post('/api/player/:telegramId/hero', (req, res) => {
   const { heroId } = req.body;
   const result = db.setPlayerHero(req.params.telegramId, heroId);
   res.json(result);
+});
+
+// REST API — получить все скины героя
+app.get('/api/player/:telegramId/skins/:heroId', (req, res) => {
+  const { telegramId, heroId } = req.params;
+  const hero = db.getPlayerHeroById(telegramId, heroId);
+  if (!hero) return res.json([]);
+  const owned = db.getOwnedSkins(telegramId, heroId);
+  const skins = getHeroSkins(heroId, hero.level, owned);
+  res.json(skins);
+});
+
+// REST API — экипировать скин
+app.post('/api/player/:telegramId/skin', (req, res) => {
+  const { heroId, skinId } = req.body;
+  const result = db.equipSkin(req.params.telegramId, heroId, skinId);
+  res.json(result);
+});
+
+// REST API — получить активный скин
+app.get('/api/player/:telegramId/active-skin/:heroId', (req, res) => {
+  const { telegramId, heroId } = req.params;
+  const hero = db.getPlayerHeroById(telegramId, heroId);
+  if (!hero) return res.json(null);
+  const skin = getActiveSkin(heroId, hero.level, hero.skin_id);
+  res.json(skin);
 });
 
 // Socket.io
