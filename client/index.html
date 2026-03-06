@@ -46,6 +46,7 @@
       </div>
       <button class="btn-primary" id="btn-pvp">Найти матч</button>
       <button class="btn-secondary" id="btn-upgrade">⬆️ Прокачка способностей</button>
+      <button class="btn-secondary" id="btn-shop">⭐ Магазин</button>
       <button class="btn-secondary" id="btn-change-hero">Сменить героя</button>
     </div>
     <div class="wins-info" id="wins-info"></div>
@@ -61,6 +62,20 @@
     <div class="upgrade-hero-display" id="upgrade-hero-display"></div>
     <div class="upgrade-abilities" id="upgrade-abilities"></div>
     <div class="upgrade-passive" id="upgrade-passive"></div>
+  </div>
+
+  <!-- Магазин -->
+  <div id="screen-shop" class="screen">
+    <div class="upgrade-header">
+      <button class="btn-back" id="btn-back-shop">← Назад</button>
+      <h2>Магазин</h2>
+      <div class="upgrade-shards" id="shop-stars">⭐ 0</div>
+    </div>
+    <div class="shop-tabs">
+      <button class="shop-tab active" data-tab="skins">Скины</button>
+      <button class="shop-tab" data-tab="effects">Эффекты</button>
+    </div>
+    <div class="shop-items" id="shop-items"></div>
   </div>
 
   <!-- Экран поиска матча -->

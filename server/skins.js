@@ -202,4 +202,90 @@ function getHeroSkins(heroId, level, ownedSkinIds = []) {
   }));
 }
 
-module.exports = { SKINS, getActiveSkin, getHeroSkins };
+// Товары магазина за Telegram Stars
+const SHOP_ITEMS = {
+  skins: [
+    {
+      id: 'witch_shadow',
+      heroId: 'witch',
+      name: 'Теневая Ведьма',
+      description: 'Ведьма из царства теней',
+      price: 50,
+      type: 'skin',
+      preview: '🌑'
+    },
+    {
+      id: 'witch_blood',
+      heroId: 'witch',
+      name: 'Кровавая Ведьма',
+      description: 'Пропитана кровью врагов',
+      price: 75,
+      type: 'skin',
+      preview: '🩸'
+    },
+    {
+      id: 'paladin_dark',
+      heroId: 'paladin',
+      name: 'Тёмный Паладин',
+      description: 'Служит не свету а тьме',
+      price: 50,
+      type: 'skin',
+      preview: '⬛'
+    },
+    {
+      id: 'paladin_gold',
+      heroId: 'paladin',
+      name: 'Золотой Страж',
+      description: 'Последний из золотых паладинов',
+      price: 100,
+      type: 'skin',
+      preview: '👑'
+    },
+    {
+      id: 'shaman_spirit',
+      heroId: 'shaman',
+      name: 'Дух Предков',
+      description: 'Полупрозрачный — между миром живых и мёртвых',
+      price: 50,
+      type: 'skin',
+      preview: '👻'
+    },
+    {
+      id: 'berserker_demon',
+      heroId: 'berserker',
+      name: 'Демон Хаоса',
+      description: 'Ярость поглотила человека полностью',
+      price: 75,
+      type: 'skin',
+      preview: '😈'
+    }
+  ],
+  effects: [
+    {
+      id: 'effect_fire',
+      name: 'Огненный след',
+      description: 'Способности оставляют огненный след',
+      price: 30,
+      type: 'effect',
+      preview: '🔥'
+    },
+    {
+      id: 'effect_void',
+      name: 'Пустота',
+      description: 'Чёрные дыры при каждом ударе',
+      price: 40,
+      type: 'effect',
+      preview: '🌀'
+    },
+    {
+      id: 'effect_lightning',
+      name: 'Молния',
+      description: 'Электрические разряды вокруг героя',
+      price: 35,
+      type: 'effect',
+      preview: '⚡'
+    }
+  ]
+};
+
+module.exports = { SKINS, SHOP_ITEMS, getActiveSkin, getHeroSkins };
